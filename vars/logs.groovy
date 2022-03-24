@@ -1,4 +1,4 @@
-def call(logs-script)           
+def call(logs-script){           
    script {
      sh '''
      #!/bin/sh
@@ -8,6 +8,4 @@ def call(logs-script)
      /bin/kill $PID
      '''
     }
-   }           
-  }
- }
+}
