@@ -1,4 +1,4 @@
-def call(name){           
+def call(){           
    script {
      sh '''
      #!/bin/sh
