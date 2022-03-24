@@ -1,4 +1,4 @@
-def call(logs-script){           
+def call(name){           
    script {
      sh '''
      #!/bin/sh
