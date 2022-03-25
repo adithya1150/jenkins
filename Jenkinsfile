@@ -124,7 +124,9 @@ pipeline {
         label params.AGENT == "any" ? "" : params.AGENT 
     }
     environment { JENKINS_NODE_COOKIE= 'do_not_kill'}
-    
+    triggers {
+        parameterizedCron 'H/2 * * * * %Environment=Training;AGENT=test;Action=logs'
+    }
     options { timestamps () }
     stages {
         stage ('defining variables'){
