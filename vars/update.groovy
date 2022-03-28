@@ -2,7 +2,6 @@ def call(dbname){
     script {
         sh '''
         #!/bin/sh
-        set +x
         sh ~/$erppath/pidscript.sh
        /usr/local/bin/daemonize  /home/sdwot/erp/bin/python /home/sdwot/$erppath/$folder/sdwot.py -c /home/sdwot/$erppath/.erp_serverrc -u all -d $dbname
         echo "An update has been started"
