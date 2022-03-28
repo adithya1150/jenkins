@@ -1,4 +1,4 @@
-def logs (logpath){
+def logs(logpath){
  script {
      sh '''
      #!/bin/sh
