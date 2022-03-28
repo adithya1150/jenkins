@@ -3,7 +3,7 @@ def call(logpath){
      sh '''
      #!/bin/sh
      set +x
-     /usr/bin/tail -f ~/$logpath/log/erp.log & PID=$!
+     /usr/bin/tail -f ~/$erppath/log/erp.log & PID=$!
      /bin/sleep 100
      /bin/kill $PID
      '''
