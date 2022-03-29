@@ -4,7 +4,7 @@ def call() {
        switch(env.Instance) {            
             case 'test':
                 env.prod_db         =   "jaya"
-                env.folder          =   "sdwot"
+                env.folder          =   "saideepa"
                 env.prod_dbuser     =   "jaya"
                 env.prod_dbpasswd   =   "jaya"
                 env.prod_hostname   =   "jaya"
