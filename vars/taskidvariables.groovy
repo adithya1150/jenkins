@@ -8,7 +8,7 @@ def call() {
                 env.prod_dbuser     =   "jaya"
                 env.prod_dbpasswd   =   "jaya"
                 env.prod_hostname   =   "jaya"
-                env.erppath         =   "$taskid"
+                env.erppath         =   "{$taskid}"
                 env.training_host   =   "192.168.181.252"                    
                 env.prod_host       =   "192.168.181.222"                    
             break
