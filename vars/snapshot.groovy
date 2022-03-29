@@ -1,6 +1,6 @@
 def call() {
     script {
-        count=sh(script: 'TIMESTAMP=`date +%d%b%y%H%M |tr '[:upper:]' '[:lower:]'`', returnStdout: true).trim()
+        //count=sh(script: 'TIMESTAMP=`date +%d%b%y%H%M |tr '[:upper:]' '[:lower:]'`', returnStdout: true).trim()
         sh '''
         #!/bin/sh
         rm -rf ~/dbs/*
@@ -13,6 +13,7 @@ def call() {
         #PGPASSWORD=$prod_dbpasswd psql -h $training_host -U $prod_dbuser postgres -c "alter database $prod_db rename to $DBNAME"
         #scp -r sdwot@$prod_host:/usr/jail/$jailname/home/sdwot/erp/data/filestore/$prod_db ~/erp/data/filestore/
         #mv  ~/erp/data/filestore/$prod_db ~/erp/data/filestore/$DBNAME
+        logs()
         '''
         echo $count
         //update($DBNAME)
