@@ -8,7 +8,6 @@ def call() {
                 env.prod_dbuser     =   "jaya"
                 env.prod_dbpasswd   =   "jaya"
                 env.prod_hostname   =   "jaya"
-                env.erppath         =   "{$taskid}"
                 env.training_host   =   "192.168.181.252"                    
                 env.prod_host       =   "192.168.181.222"                    
             break
@@ -18,7 +17,6 @@ def call() {
                 env.prod_dbuser     =   "saideepa"
                 env.prod_dbpasswd   =   "saideepa"
                 env.prod_hostname   =   "saideepa"                      
-                env.erppath         =   "$taskid"
                 env.training_host   =   "192.168.181.252"                    
                 env.prod_host       =   "192.168.181.222" 
             break
@@ -27,8 +25,7 @@ def call() {
                 env.folder          =   "sdwot"
                 env.prod_dbuser     =   "jaya"
                 env.prod_dbpasswd   =   "jaya"
-                env.prod_hostname   =   "jaya"
-                env.erppath         =   "$taskid"                
+                env.prod_hostname   =   "jaya"              
                 env.training_host   =   "192.168.181.252"                    
                 env.prod_host       =   "192.168.181.222"
             break
@@ -37,8 +34,7 @@ def call() {
                 env.folder          =   "saideepa"
                 env.prod_dbuser     =   "drilltech"
                 env.prod_dbpasswd   =   "drilltech"                  
-                env.jailname        =   "drilltech"
-                env.erppath         =   "$taskid"                 
+                env.jailname        =   "drilltech"                 
                 env.training_host   =   "192.168.181.252"                    
                 env.prod_host       =   "192.168.181.222"
             break
@@ -47,8 +43,7 @@ def call() {
                 env.folder          =   "saideepa"
                 env.prod_dbuser     =   "rockbit"
                 env.prod_dbpasswd   =   "rockbit"  
-                env.jailname        =   "rockbit"
-                env.erppath         =   "$taskid"                                  
+                env.jailname        =   "rockbit"                                 
                 env.ip              =   "192.168.181.246"
                 env.training_host   =   "192.168.181.252"                                                          
             break
@@ -56,8 +51,7 @@ def call() {
                 env.prod_db         =   "rocktec" 
                 env.folder          =   "saideepa"
                 env.prod_dbuser     =   "rocktec"
-                env.prod_dbpasswd   =   "rocktec"
-                env.erppath     =   "$taskid"                                   
+                env.prod_dbpasswd   =   "rocktec"                                 
                 env.training_host   =   "192.168.6.3"                    
                 env.prod_host       =   "192.168.6.111"                                      
             break
@@ -66,8 +60,7 @@ def call() {
                 env.folder          =   "cenerg"
                 env.prod_dbuser     =   "cenerg"
                 env.prod_dbpasswd   =   "cenerg"
-                env.jailname        =   "cenerg" 
-                env.erppath         =   "$taskid"                                  
+                env.jailname        =   "cenerg"                                  
                 env.training_host   =   "192.168.6.3"                    
                 env.prod_host       =   "192.168.6.111"                                      
             break
@@ -76,8 +69,7 @@ def call() {
                 env.folder          =   "saideepa"
                 env.prod_dbuser     =   "sdf"
                 env.prod_dbpasswd   =   "sdf"
-                env.jailname        =   "sdf" 
-                env.erppath         =   "$taskid"                                  
+                env.jailname        =   "sdf"                                   
                 env.training_host   =   "192.168.6.3"                    
                 env.prod_host       =   "192.168.6.111"                                      
             break            
