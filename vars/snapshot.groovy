@@ -1,5 +1,6 @@
 def call() {
     script {
+        count=sh(script: 'TIMESTAMP=`date +%d%b%y%H%M | tr '[:upper:]' '[:lower:]'`', returnStdout: true).trim()
         sh '''
         #!/bin/sh
         rm -rf ~/dbs/*
@@ -13,7 +14,7 @@ def call() {
         #scp -r sdwot@$prod_host:/usr/jail/$jailname/home/sdwot/erp/data/filestore/$prod_db ~/erp/data/filestore/
         #mv  ~/erp/data/filestore/$prod_db ~/erp/data/filestore/$DBNAME
         '''
-        echo $DBNAME
+        echo $count
         //update($DBNAME)
     }
 }
