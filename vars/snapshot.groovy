@@ -1,4 +1,4 @@
-def snapshot () {
+def call() {
     script {
         sh '''
         #!/bin/sh
