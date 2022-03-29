@@ -1,5 +1,5 @@
 
-def variables() {
+def call() {
     script{
        switch(env.AGENT) {            
             case 'test':
