@@ -1,4 +1,4 @@
-def call (erppath)  {
+def call ()  {
     script {
        sh '''
        #!/bin/sh
