@@ -1,6 +1,5 @@
-def call(dbname){
+def call(){
     script {
-        echo $dbname
         sh '''
         #!/bin/sh
         sh ~/$erppath/pidscript.sh
