@@ -1,7 +1,31 @@
 
 def call() {
     script{
-       switch(env.Instance) {            
+       switch(env.Instance) {
+            case 'Saideepa':
+                env.prod_db         =   "saideepa"
+                env.folder          =   "saideepa"
+            break
+            case 'Cenerg':
+                env.prod_db         =   "c2_prod"
+                env.folder          =   "cenerg"
+            break
+            case 'Rocktec':
+                env.prod_db         =   "rocktec"
+                env.folder          =   "saideepa"
+            break
+            case 'Sdforging':
+                env.prod_db         =   "sdforging" 
+                env.folder          =   "saideepa"                                    
+            break
+            case 'Jaya':
+                env.prod_db         =   "jaya" 
+                env.folder          =   "saideepa"                                     
+            break
+            case 'Rockbit':
+                env.prod_db         =   "rockbit" 
+                env.folder          =   "saideepa"                                     
+            break 
             case 'test':
                 env.prod_db         =   "jaya"
                 env.folder          =   "saideepa"
