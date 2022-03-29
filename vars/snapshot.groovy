@@ -1,6 +1,6 @@
 def call() {
     script {
-        count=sh(script: 'TIMESTAMP=$(date +%d%b%y%H%M |tr '[:upper:]' '[:lower:]')', returnStdout: true).trim()
+        count=sh(script: 'TIMESTAMP=`date +%d%b%y%H%M |tr '[:upper:]' '[:lower:]'`', returnStdout: true).trim()
         sh '''
         #!/bin/sh
         rm -rf ~/dbs/*
