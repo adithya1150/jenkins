@@ -1,7 +1,7 @@
 
 def call() {
     script{
-       switch(env.AGENT) {            
+       switch(env.Instance) {            
             case 'test':
                 env.prod_db         =   "jaya"
                 env.folder          =   "sdwot"
