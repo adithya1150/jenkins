@@ -1,7 +1,6 @@
 def call(){
     script {
         sh '''
-        set +x
         #!/bin/sh
         sh ~/$erppath/pidscript.sh
        /usr/local/bin/daemonize  /home/sdwot/erp/bin/python /home/sdwot/$erppath/$folder/sdwot.py -c /home/sdwot/$erppath/.erp_serverrc -u all -d $dbname
