@@ -12,8 +12,8 @@ def call() {
         #PGPASSWORD=$prod_dbpasswd psql -h $training_host -U $prod_dbuser postgres -c "alter database $prod_db rename to $DBNAME"
         #scp -r sdwot@$prod_host:/usr/jail/$jailname/home/sdwot/erp/data/filestore/$prod_db ~/erp/data/filestore/
         #mv  ~/erp/data/filestore/$prod_db ~/erp/data/filestore/$DBNAME
-        logs()
         '''
+        logs()
         //update($DBNAME)
     }
 }
