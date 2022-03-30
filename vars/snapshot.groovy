@@ -1,12 +1,12 @@
 def call() {
     script {
-        dbname=sh(script: '$prod_db$(date +%d%b%y%H%M)', returnStdout: true).trim()
+        TIMESTAMP=sh(script: 'date +%d%b%y%H%M', returnStdout: true).trim() 
+        dbname=sh(script: '$prod_db$TIMESTAMP', returnStdout: true).trim()
         sh '''
           #!/bin/sh
           rm -rf ~/dbs/*
           PGPASSWORD=$prod_dbpasswd pg_dump -h $prod_host --no-owner --no-acl -U $prod_dbuser $prod_db >~/dbs/$prod_db.sql
           DBNAME='"'$dbname'"'
-          dbname=$prod_db$TIMESTAMP
           PGPASSWORD=$prod_dbpasswd psql -h $training_host -U $prod_dbuser postgres -c "create database $DBNAME;"        
           PGPASSWORD=$prod_dbpasswd psql -h $training_host -U $prod_dbuser $dbname < ~/dbs/$prod_db.sql
           sh ~/pidscript.sh
