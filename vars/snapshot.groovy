@@ -14,8 +14,8 @@ def call() {
           scp -r sdwot@$prod_host:/usr/jail/$jailname/home/sdwot/erp/data/filestore/$prod_db ~/erp/data/filestore/
           mv  ~/erp/data/filestore/$prod_db ~/erp/data/filestore/$dbname
         '''
-        dbname=sh(script: 'cat ~/dbs/dbname', returnStdout: true).trim()
-        echo dbname
+       dbname=sh(script: 'cat ~/dbs/dbname', returnStdout: true).trim()
+       env.dbname="${dbname}"       
        update()
     }
 }
