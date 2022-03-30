@@ -4,7 +4,7 @@ def call() {
           #!/bin/sh
           rm -rf ~/dbs/*
           #PGPASSWORD=$prod_dbpasswd pg_dump -h $prod_host --no-owner --no-acl -U $prod_dbuser $prod_db >~/dbs/$prod_db.sql
-          dbname=$prod_db$`date +%d%b%y%H%M`
+          dbname=$prod_db`date +%d%b%y%H%M`
           echo "$dbname" > ~/dbs/dbname
           echo $dbname
           DBNAME='"'$dbname'"'
