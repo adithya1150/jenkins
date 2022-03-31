@@ -28,7 +28,7 @@ def call() {
             break 
             case 'test':
                 env.prod_db         =   "jaya"
-                env.folder          =   "saideepa"
+                env.folder          =   "sdwot"
                 env.prod_dbuser     =   "jaya"
                 env.prod_dbpasswd   =   "jaya"
                 env.training_host   =   "192.168.181.252"                    
