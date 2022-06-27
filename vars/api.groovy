@@ -1,5 +1,3 @@
- (13 sloc)  385 Bytes
-
 def call(){
     script {
         sh '''
