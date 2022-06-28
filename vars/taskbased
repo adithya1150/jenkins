@@ -1,0 +1,195 @@
+@Library('logs') _
+pipeline {
+    agent {
+        label params.Instance == "any" ? "" : params.Instance 
+    }
+    options { timestamps () }
+    parameters {
+        choice(name: "Instance", choices: ["test", "rocktect", "cenergt", "test", "sdforgingt",])   
+        choice(name: 'action',choices: ['logs','create','restart','pullupdate','pullrestart','delete'])
+        
+    }
+    environment {
+        JENKINS_NODE_COOKIE = 'do_not_kill'
+        erppath = "$taskid"
+        dbname  =   "$taskid"
+    }    
+    stages {
+        stage ('defining variables'){
+            steps {
+                buildName "# ${BUILD_NUMBER} | $taskid | $Instance | $action"
+                variables()
+            }
+        }
+        stage ('logs') {
+            when {
+                expression { action == "logs" }
+            }
+            steps  { 
+               logs()
+            }
+        }
+        stage ('Restart') {
+            when {
+                expression { action == "restart"}
+            }
+            steps ('restarting the instance') {
+                restart()
+            }
+        }
+        stage ('pullupdate') {
+            when {
+                expression { action == "pullupdate"}
+            }            
+            steps  {
+                script{
+                    sh '''
+                    cd ~/$erppath/$folder
+                    git reset --hard
+                    git flow feature pull origin "$taskid"
+                    '''
+                    update()
+                }
+            }
+        }
+        stage ('Pull restart') {
+            when {
+                expression { action == "pullrestart"}
+            }
+            steps ('restarting the instance') {
+                script{
+                    sh '''
+                    cd ~/$erppath/$folder
+                    git reset --hard
+                    git flow feature pull origin "$taskid"
+                    '''
+                    restart()
+                }
+            }
+        }
+        stage ('creating instance') {
+            when {
+                expression { action == "create" }
+            }
+            steps ('creating instance') {
+                script  {
+                    sh '''
+                    #!/bin/sh
+                    mkdir ~/$taskid
+                    cd ~/$taskid && mkdir log dbs && cp -r ~/erp/.erp_serverrc ~/erp/start.sh ~/pidscript.sh .
+                    git clone $url
+                    cd $folder
+                    git flow init -fd && git flow feature start $taskid && git flow feature publish $taskid
+                    '''
+                }
+                script {
+                    sh '''
+                    #!/bin/sh
+                    echo "creating and importing database"
+                    set +x
+                    PGPASSWORD=usermanage psql -h $training_host -U usermanage postgres -c "create user $taskid with password '$taskid' createdb;"
+                    PGPASSWORD=$taskid psql -h $training_host -U $taskid postgres -c "create database $taskid;"
+                    PGPASSWORD=$prod_dbpasswd psql -h $prod_host -U $prod_dbuser $prod_db > ~/$taskid/dbs/$prod_db.sql
+                    PGPASSWORD=$taskid psql -h $training_host -U $taskid $taskid < ~/$taskid/dbs/$prod_db.sql
+                    
+                    ################# httport ############
+                    a=8100
+                    while port=$(grep $a /home/sdwot/ports/httpport)
+                    do
+	                suma=$(( $port + 1 ))
+	                a=$suma
+                    done
+	                echo $a >> /home/sdwot/ports/httpport
+	                echo $a > /home/sdwot/$taskid/httpport
+	                httpport=$a
+                    
+                    ############## longpolling port ###########
+                    b=8200
+                    while poll=$(grep $b /home/sdwot/ports/longpoll)
+                    do
+	                sumb=$(( $poll + 1 ))
+                    b=$sumb
+                    done
+	                echo $b >> /home/sdwot/ports/longpoll
+                    echo $b > /home/sdwot/$taskid/longpoll
+                    longpoll=$b
+
+	                sed -i -e '/http_port/ s/=.*$/= '"$httpport"'/' ~/$taskid/.erp_serverrc
+                    sed -i -e '/longpolling_port/ s/=.*$/= '"$longpoll"'/' ~/$taskid/.erp_serverrc
+                    sed -i -e '/db_user/ s/=.*$/= '"$taskid"'/' ~/$taskid/.erp_serverrc
+                    sed -i -e '/db_password/ s/=.*$/= '"$taskid"'/' ~/$taskid/.erp_serverrc
+                    sed -i -e '/logfile/ s|=.*$|= '/home/sdwot/$taskid/log/erp.log'|' ~/$taskid/.erp_serverrc
+                    sed -i -e '/pidfile/ s|=.*$|= '/home/sdwot/$taskid/log/erp-server.pid'|' ~/$taskid/.erp_serverrc
+                    sed -i -e 's|sdwot/erp|sdwot/'$taskid'|g' ~/$taskid/pidscript.sh
+                    sed -i -e 's|grep erp|grep '$taskid'|g' ~/$taskid/pidscript.sh
+                    
+                    echo "configuring apache and local dns"
+                    ssh jbuild@$apache_host -T "echo -e '<VirtualHost *:80>\nServerName $taskid.sdgrp.org\nRedirectPermanent / https://$taskid.sdgrp.org/\n</VirtualHost>\n
+                        \n<VirtualHost *:443>\nServerName $taskid.sdgrp.org\nErrorLog "/var/log/erp.$taskid-error.log"\nCustomLog "/var/log/erp.$taskid-access.log" common
+                        \nSSLProxyEngine on\nSSLEngine on\nSSLCertificateFile /etc/letsencrypt/live/sdgrp.org/cert.pem
+                        \nSSLCertificateKeyFile /etc/letsencrypt/live/sdgrp.org/privkey.pem\nSSLCertificateChainFile /etc/letsencrypt/live/sdgrp.org/chain.pem
+                        \n<Location />\nSSLRequireSSL\n</Location>\nProxyPreserveHost On\nProxyPass /longpolling/ http://$ip:$longpoll/longpolling/
+                        \nProxyPassReverse /longpolling/ http://$taskid.sdgrp.org:$longpoll/longpolling/
+                        \nProxyPass / http://$ip:$httpport/ connectiontimeout=300 timeout=300 Keepalive=On
+                        \nProxyPassReverse / http://$taskid.sdgrp.org:$httpport/\nRequestHeader set "X-Forwarded-Proto" "https"
+                        \n</VirtualHost>' > $apache_path/$taskid.conf  && echo '$taskid		IN		A		$apache_host' >> /var/named/fw-sdgrp.org &&\
+                        sh ~/httprestart.sh && sh ~/dnsreload.sh" 
+                    '''
+                }
+                script{
+                    sh '''
+                        #!/bin/sh
+                        echo "creating public dns record"
+                        set +x
+                        DOMAIN=sdgrp.org
+                        RECORD_NAME=$taskid
+                        GODADDY_API_KEY=9Zw46KCQVTV_MPcqiabSde55waN9Brb4mt
+                        GODADDY_API_SECRET=S2MJGHdhvguKJeL5Bpbm8c
+
+                        # Create DNS A Record
+                        /usr/local/bin/curl -X PUT -H 'Content-Type: application/json' -H 'Accept: application/json' -H "Authorization: sso-key $GODADDY_API_KEY:$GODADDY_API_SECRET" "https://api.godaddy.com/v1/domains/$DOMAIN/records/A/$RECORD_NAME" -d "[{\\"data\\": \\"$public_ip\\"}]" 
+                    '''
+                }
+                update()        
+            }
+        }
+        stage ('deleting instance') {
+            when {
+                expression { action == "delete" }
+            }
+            input {
+                        message "Are you sure you want to proceed?"
+                    }
+            steps{
+                script {
+                    sh '''
+                    #!/bin/sh
+                    httpport=$(cat /home/sdwot/$taskid/httpport)
+                    longpoll=$(cat /home/sdwot/$taskid/longpoll)
+                    echo $httpport
+                    echo $longpoll
+                    sed -i -e '/'"$httpport"'/d' ~/ports/httpport
+                    sed -i -e '/'"$longpoll"'/d' ~/ports/longpoll
+                   # kill -TERM $(cat /home/sdwot/$taskid/log/erp-server.pid)
+                    #/bin/sleep 40
+                
+                    set +x 
+                    /bin/echo "dropping database and user"                    
+                    PGPASSWORD=$taskid psql -h $training_host -U $taskid postgres -c "drop database $taskid;"
+                    PGPASSWORD=usermanage psql -h $training_host -U usermanage postgres -c "drop user $taskid;"
+                    rm -rf  /home/sdwot/$taskid
+                    /bin/echo "removing apache configuration and local dns"
+                    ssh jbuild@$apache_host -T "rm -rf /etc/httpd/conf.d/$taskid.conf && sed -i  -e '/'"$taskid"'/d' /var/named/fw-sdgrp.org &&sh ~/httprestart.sh && sh ~/dnsreload.sh"
+                    /bin/echo "deleting public dns record"
+                    ## removing $taskid record from public dns
+                    DOMAIN=sdgrp.org
+                    RECORD_NAME=$taskid
+                    GODADDY_API_KEY=9Zw46KCQVTV_MPcqiabSde55waN9Brb4mt
+                    GODADDY_API_SECRET=S2MJGHdhvguKJeL5Bpbm8c
+                    /usr/local/bin/curl -X DELETE -H 'Content-Type: application/json' -H 'Accept: application/json' -H "Authorization: sso-key $GODADDY_API_KEY:$GODADDY_API_SECRET" "https://api.godaddy.com/v1/domains/$DOMAIN/records/A/$RECORD_NAME" 
+                    '''            
+                }
+            }
+        }
+    }
+}
